@@ -1,3 +1,4 @@
+var currentPlaylist = [];
 $(document).ready(function() {
   // oauth ajax
   $.ajax({
@@ -10,7 +11,6 @@ $(document).ready(function() {
     })
   });
   // albums ajax
-  i=0
   $.ajax({
     url: '/api/newReleases',
     type: 'GET',
@@ -20,37 +20,58 @@ $(document).ready(function() {
     albums = parsedResults.albums.items
     console.log(albums)
     albums.forEach(function(album) {
-      // i++;
-      albumImg = $('<img>').attr('src', album.images[2].url);
-      albumImg.addClass('grid-item');
-      // if (i>15){
-      //   albumImg.addClass('grid-item--width2');
-      //   albumImg.addClass('grid-item--height2');
-      // } else if (i>10 && i<15) {
-      //   albumImg.addClass('grid-item--width3');
-      //   albumImg.addClass('grid-item--height3');
-      // } else if (i>5 && i<10) {
-      //   albumImg.addClass('grid-item--height4');
-      //   albumImg.addClass('grid-item--width4');
-      // }
-      albumImg.on('click', function() {
-        $.ajax({
-          url: '/api/album/'+album.id,
-          type: 'GET',
-          dataType: 'json'
-        }).done(function(album) {
-          artist = album.artists[0];
-          tracks = album.tracks;
-          // handle bars?
-          console.log(artist);
-          console.log(tracks);
-          console.log(album);
+      $.ajax({
+        url: '/api/album/'+album.id,
+        type: 'GET',
+        dataType: 'json'
+      }).done(function(album) {
+        albumImg = $('<img>').attr('src', album.images[1].url);
+        // size = album.popularity+200
+        // albumImg.css('width', size);
+        // albumImg.css('height', size);
+        albumImg.addClass('grid-item');
+        albumImg.on('click', function() {
+          $.ajax({
+            url: '/api/album/'+album.id,
+            type: 'GET',
+            dataType: 'json'
+          }).done(function(album) {
+            // modals with handlebars
+            if ($('#album-content')) {
+              $('#album-content').remove();
+            }
+            artist = album.artists[0].name;
+            tracks = album.tracks.items;
+            console.log(album);
+            var source = $("#entry-template").html();
+            var template = Handlebars.compile(source);
+            var context = {album_name: album.name, tracks: tracks, artist: artist};
+            var html = template(context);
+            $('body').append(html);
+            $("#album-back-button").on('click', function() {
+              $('#album-content').remove();
+            })
+            $(".add").on('click', function(event) {
+              track_id = event.target.getAttribute('trackId');
+              artist = $('#artist-name').text();
+              track_name = event.target.getAttribute('trackName');
+              currentPlaylist.push({track_id: track_id, track_name: track_name, track_artist: artist});
+              console.log(currentPlaylist);
+              var source = $("#entry-template-two").html();
+              var template = Handlebars.compile(source);
+              var context = {playlist_name: album.name, tracks: currentPlaylist}
+              var html = template(context);
+              $("#playlist-back-button").on('click', function() {
+                $('#playlist-content').remove();
+              })
+            })
+          })
         })
-      })
-      $('#album-container').append(albumImg);
+        $('#album-container').append(albumImg);
+      });
+    // size based on popularity?
     })
   });
-  j=0;
   $.ajax({
     url: '/api/newReleasesTwo',
     type: 'GET',
@@ -60,40 +81,74 @@ $(document).ready(function() {
     albums = parsedResults.albums.items
     console.log(albums)
     albums.forEach(function(album) {
-      // j++;
-      albumImg = $('<img>').attr('src', album.images[2].url);
-      albumImg.addClass('grid-item');
-      // if (j>17){
-      //   albumImg.addClass('grid-item--width2');
-      //   albumImg.addClass('grid-item--height4');
-      // } else if (j>14 && i<17) {
-      //   albumImg.addClass('grid-item--width3');
-      //   albumImg.addClass('grid-item--height2');
-      // } else if (j>10 && i<14) {
-      //   albumImg.addClass('grid-item--height4');
-      // } else if (j>6 && i<10) {
-      //   albumImg.addClass('grid-item--width4');
-      //   albumImg.addClass('grid-item--height2');
-      // } else if (j>3 && i<6) {
-      //   albumImg.addClass('grid-item--width3');
-      // }
-      albumImg.on('click', function() {
-        $.ajax({
-          url: '/api/album/'+album.id,
-          type: 'GET',
-          dataType: 'json'
-        }).done(function(album) {
-          artist = album.artists[0];
-          tracks = album.tracks;
-          // handle bars?
-          console.log(artist);
-          console.log(tracks);
-          console.log(album);
+      $.ajax({
+        url: '/api/album/'+album.id,
+        type: 'GET',
+        dataType: 'json'
+      }).done(function(album) {
+        albumImg = $('<img>').attr('src', album.images[1].url);
+        // size = album.popularity+200
+        // albumImg.css('width', size);
+        // albumImg.css('height', size);
+        albumImg.addClass('grid-item');
+        albumImg.on('click', function() {
+          $.ajax({
+            url: '/api/album/'+album.id,
+            type: 'GET',
+            dataType: 'json'
+          }).done(function(album) {
+            // modals with handlebars
+            if ($('#album-content')) {
+              $('#album-content').remove();
+            }
+            artist = album.artists[0].name;
+            tracks = album.tracks.items;
+            console.log(album);
+            var source = $("#entry-template").html();
+            var template = Handlebars.compile(source);
+            var context = {album_name: album.name, tracks: tracks, artist: artist};
+            var html = template(context);
+            $('body').append(html);
+            $("#album-back-button").on('click', function() {
+              $('#album-content').remove();
+            })
+            $(".add").on('click', function(event) {
+              track_id = event.target.getAttribute('trackId');
+              artist = $('#artist-name').text();
+              track_name = event.target.getAttribute('trackName');
+              currentPlaylist.push({track_id: track_id, track_name: track_name, track_artist: artist});
+              console.log(currentPlaylist);
+            })
+          })
         })
-      })
-      $('#album-container').append(albumImg);
+        $('#album-container').append(albumImg);
+      });
+    // size based on popularity?
     })
   });
+  // view playlist
+  $('#view-playlist').on('click', function() {
+    var source = $("#entry-template-two").html();
+    var template = Handlebars.compile(source);
+    var context = {playlist_name: 'Playlist', tracks: currentPlaylist}
+    var html = template(context);
+    $('body').append(html);
+    $("#playlist-back-button").on('click', function() {
+      $('#playlist-content').remove();
+    })
+  });
+  // login ajax
+  $('#login').on('submit', function(event) {
+    event.preventDefault();
+    $.ajax({
+      url: '/api/createAlex',
+      type: 'GET',
+      dataType: 'json'
+    }).done(function (results) {
+      console.log(results)
+    })
+  })
+  // grid stuff
   $('.grid').masonry({
     itemSelector: '.grid-item',
     columnWidth: 200

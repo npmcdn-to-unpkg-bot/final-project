@@ -4,15 +4,44 @@
   <title>New Release</title>
 
   <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="bower_components/handlebars/handlebars.min.js"></script>
   <script type="text/javascript" src="bower_components/masonry/dist/masonry.pkgd.js"></script>
   <script type="text/javascript" src="js/main.js"></script>
   <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
+
+  <script id="entry-template" type="text/x-handlebars-template">
+    <div id="album-content">
+      <h1>{{album_name}}</h1>
+      <h1 id="artist-name">{{artist}}</h1>
+      <div id="tracks">
+        {{#each tracks}} {{name}}<button class="add" trackId={{id}} trackName={{name}}>Add to Playlist</button></br>{{/each}}
+      </div>
+      <button id="album-back-button" >Back</button>
+    </div>
+  </script>
+
+  <script id="entry-template-two" type="text/x-handlebars-template">
+    <div id="playlist-content">
+      <h1>{{playlist_name}}</h1>
+      <div id="tracks">
+       {{#each tracks}} {{track_name}} {{track_artist}} <button>Remove</button> </br>{{/each}}
+      </div>
+    <button id="playlist-back-button">Back</button>
+  </script>
+
   <h1>New Releases</h1>
   <button id="connect">Connect</button>
   <button id="view-playlist">View Playlist</button>
   <button id="submit-playlist">Submit Playlist</button>
+
+  <form id="login" method="POST" action="/login">
+    <input type="text" name="username">
+    <input type="password" password="password">
+    <input type="submit">
+  </form>
+
   <div class="grid" id="album-container" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 200 }'></div>
 </body>
 </html>

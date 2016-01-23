@@ -1,4 +1,4 @@
-// express app
+// express app, body-parser, request, mongoose, bcrypt, sessions, and mongoose models
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -11,24 +11,29 @@ var bcrypt = require('bcrypt');
 
 // annas user authentication
 var authenticateUser = function(name, password, callback) {
-  User.findOne({name: name}, function(err, user) {
+  User.findOne({username: name}, function(err, user){
+    console.log(arguments);
     if (err) {
       console.log(err);
     }
-    bcrypt.compare(password, user.password_digest, function (err, results) {
-      if (results) {
-        callback(data);
-      } else {
-        callback(false);
-      }
-    })
-  })
+    if (user) {
+      bcrypt.compare(password, user.password_digest, function (err, results) {
+        if (results) {
+          callback(user);
+        } else {
+          callback(false);
+        }
+      })
+    }
+  });
 }
 
 // app config
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'ejs');
+
+// creates session
 app.use(session({
   secret: 'music'
 }))
@@ -53,6 +58,10 @@ db.once('open', function() {
 
 // page route handlers
 app.get('/', function(req, res) {
+  res.render('login');
+});
+// renders dashboard?
+app.get('/login', function(req, res) {
   if (req.query.code) {
     var code = req.query.code;
     spotifyApi.authorizationCodeGrant(code, function(err, results){
@@ -60,14 +69,37 @@ app.get('/', function(req, res) {
       spotifyApi.setRefreshToken(results.body['refresh_token']);
     })
   }
-  res.render('index');
-});
+  res.render('index')
+})
+// renders sign up form
+app.get('/users/new', function(req, res) {
+  res.render('sign_up')
+})
+// creates user and redirects to login
+app.post('/users', function (req, res) {
+  User.createDigestAndSave({username: req.body.username, password: req.body.password}, function(user) {
+    session['username'] = user.username;
+    session['userId'] = user._id;
+    res.redirect('/');
+  })
+})
+// logs user in, creates session, and redirects to /login
+app.post('/login', function(req, res){
+  authenticateUser(req.body.username, req.body.password, function(user){
+    if (user) {
+      req.session.name = user.name
+      res.redirect('/login');
+    } else {
+      res.json('failure');
+    }
+  });
+})
 
 // ajax route handlers
 app.get('/api/oauth', function(req, res) {
   res.json(authorizeUrl);
 });
-
+// grabs 1st 20 new releases
 app.get('/api/newReleases', function(req, res) {
   request('https://api.spotify.com/v1/search?q=tag:new&type=album', function(err, results) {
     if (err) {
@@ -76,7 +108,7 @@ app.get('/api/newReleases', function(req, res) {
     res.json(results.body);
   })
 })
-
+// grabs 2nd 20 new releases
 app.get('/api/newReleasesTwo', function(req, res) {
   request('https://api.spotify.com/v1/search?q=tag:new&type=album&offset=20', function(err, results) {
     if (err) {
@@ -85,48 +117,9 @@ app.get('/api/newReleasesTwo', function(req, res) {
     res.json(results.body);
   })
 })
-
-app.get('/api/createUser', function(req, res) {
-  user = new User({username: req.body.username});
-  bcrypt.hash(req.body.password, 8, function(err, hash) {
-    user.password_digest = hash
-    user.save(function (err) {
-      if (err) {
-        console.log(err)
-      }
-      console.log('created user');
-      res.end();
-    })
-  })
-})
-
-app.get('/api/createAlex', function (req, res) {
-  user = new User({username: 'Scho'});
-  bcrypt.hash('password', 8, function(err, hash) {
-    user.password_digest = hash
-    user.save(function (err) {
-      if (err) {
-        console.log(err)
-      }
-      console.log('created user');
-      res.end();
-    })
-  })
-})
-
-app.post('/login', function(req, res){
-  authenticateUser(req.body.username, req.body.password, function (user){
-    if (user) {
-      req.session.name = user.name
-      res.json('success');
-    } else {
-      res.json('failure');
-    }
-  });
-})
-
-app.get('/api/createPlaylist', function(req, res) {
-  playlist = Playlist({name: "AwesomenessTwo", username: "Jeff"});
+// creates playlist
+app.post('/api/createPlaylist', function(req, res) {
+  playlist = Playlist({name: req.body.name, username: req.session.name, tracks: req.body.tracks});
   playlist.save(function(err) {
     if (err) {
       console.log(err);
@@ -135,7 +128,7 @@ app.get('/api/createPlaylist', function(req, res) {
     res.end();
   })
 });
-
+// gets more info on album
 app.get('/api/album/:id', function(req, res) {
   spotifyApi.getAlbum(req.params.id, function(err, results) {
     if (err) {

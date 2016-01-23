@@ -7,10 +7,10 @@ $(document).ready(function() {
     dataType: 'json'
   }).done(function(results) {
     $('#connect').click(function() {
-      location.href=results
+      location.href=results;
     })
   });
-  // albums ajax
+  // new release album ajax
   $.ajax({
     url: '/api/newReleases',
     type: 'GET',
@@ -26,11 +26,9 @@ $(document).ready(function() {
         dataType: 'json'
       }).done(function(album) {
         albumImg = $('<img>').attr('src', album.images[1].url);
-        // size = album.popularity+200
-        // albumImg.css('width', size);
-        // albumImg.css('height', size);
         albumImg.addClass('grid-item');
         albumImg.on('click', function() {
+          // individual albums ajax
           $.ajax({
             url: '/api/album/'+album.id,
             type: 'GET',
@@ -81,15 +79,13 @@ $(document).ready(function() {
     albums = parsedResults.albums.items
     console.log(albums)
     albums.forEach(function(album) {
+      // individual albums ajax
       $.ajax({
         url: '/api/album/'+album.id,
         type: 'GET',
         dataType: 'json'
       }).done(function(album) {
         albumImg = $('<img>').attr('src', album.images[1].url);
-        // size = album.popularity+200
-        // albumImg.css('width', size);
-        // albumImg.css('height', size);
         albumImg.addClass('grid-item');
         albumImg.on('click', function() {
           $.ajax({
@@ -137,15 +133,15 @@ $(document).ready(function() {
       $('#playlist-content').remove();
     })
   });
-  // login ajax
-  $('#login').on('submit', function(event) {
-    event.preventDefault();
+  // create playlist ajax
+  $('#submit-playlist').on('click', function() {
     $.ajax({
-      url: '/api/createAlex',
-      type: 'GET',
-      dataType: 'json'
+      url: '/api/createPlaylist',
+      type: 'POST',
+      dataType: 'json',
+      data: currentPlaylist
     }).done(function (results) {
-      console.log(results)
+      console.log(results);
     })
   })
   // grid stuff

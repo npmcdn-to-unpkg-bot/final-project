@@ -6,8 +6,10 @@ $(document).ready(function() {
     type: 'GET',
     dataType: 'json'
   }).done(function(results) {
+    console.log(results)
     $('#connect').click(function() {
       location.href=results;
+
     })
   });
   // new release album ajax
@@ -85,9 +87,7 @@ $(document).ready(function() {
         type: 'GET',
         dataType: 'json'
       }).done(function(album) {
-        albumImg = $('<img>').attr('src', album.images[1].url);
-        albumImg.addClass('grid-item');
-        albumImg.on('click', function() {
+        albumImg = $('<img>').attr('src', album.images[1].url).addClass('grid-item').on('click', function() {
           $.ajax({
             url: '/api/album/'+album.id,
             type: 'GET',
@@ -129,20 +129,41 @@ $(document).ready(function() {
     var context = {playlist_name: 'Playlist', tracks: currentPlaylist}
     var html = template(context);
     $('body').append(html);
+    $('.remove-track').on('click', function(event) {
+      renderedPlaylist = currentPlaylist.filter(function(track) {
+        return event.target.getAttribute('trackId') === track.track_id
+      })
+      console.log(renderedPlaylist)
+      // event.target.parentElement.remove();
+    })
     $("#playlist-back-button").on('click', function() {
       $('#playlist-content').remove();
     })
   });
+
   // create playlist ajax
   $('#submit-playlist').on('click', function() {
     $.ajax({
-      url: '/api/createPlaylist',
+      url: '/api/createPlaylist/playlist',
       type: 'POST',
       dataType: 'json',
-      data: currentPlaylist
+      data: {
+        playlist: currentPlaylist
+      }
     }).done(function (results) {
       console.log(results);
     })
+  })
+
+  // logout ajax
+  $('#logout').on('click', function() {
+    $.ajax({
+      url: '/logout',
+      type: 'GET',
+      dataType: 'json'
+    }).done(
+      location.href='http://127.0.0.1:3000'
+    )
   })
   // grid stuff
   $('.grid').masonry({

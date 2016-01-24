@@ -26,7 +26,7 @@ var authenticateUser = function(name, password, callback) {
       })
     }
   });
-}
+};
 
 // app config
 app.use(bodyParser.urlencoded({extended: true}));
@@ -43,10 +43,10 @@ var spotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new spotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
   clientSecret: process.env.SPOTIFY_SECRET,
-  redirectUri: "http://127.0.0.1:3000"
+  redirectUri: "http://127.0.0.1:3000/index"
 });
-var scopes = ["playlist-read-private", "playlist-read-collaborative", "streaming", "playlist-modify-public", "playlist-modify-private", "user-follow-modify", "user-read-email"];
-var authorizeUrl = spotifyApi.createAuthorizeURL(scopes);
+var scopes = ["playlist-read-private", "playlist-read-collaborative", "streaming", "playlist-modify-public", "playlist-modify-private", "user-follow-modify", "user-read-email", "user-library-read"];
+var authorizeUrl = spotifyApi.createAuthorizeURL(scopes, null);
 
 // mongoose database
 mongoose.connect("mongodb://localhost:27017/spotify");
@@ -57,14 +57,15 @@ db.once('open', function() {
 })
 
 // page route handlers
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
   res.render('login');
 });
 // renders dashboard?
-app.get('/login', function(req, res) {
+app.get('/index', function (req, res) {
   if (req.query.code) {
     var code = req.query.code;
     spotifyApi.authorizationCodeGrant(code, function(err, results){
+      req.session['spotify_access_token'] = results.body['access_token']
       spotifyApi.setAccessToken(results.body['access_token']);
       spotifyApi.setRefreshToken(results.body['refresh_token']);
     })
@@ -72,30 +73,37 @@ app.get('/login', function(req, res) {
   res.render('index')
 })
 // renders sign up form
-app.get('/users/new', function(req, res) {
+app.get('/users/new', function (req, res) {
   res.render('sign_up')
 })
 // creates user and redirects to login
 app.post('/users', function (req, res) {
   User.createDigestAndSave({username: req.body.username, password: req.body.password}, function(user) {
-    session['username'] = user.username;
-    session['userId'] = user._id;
-    res.redirect('/');
+    req.session['username'] = user.username;
+    req.session['userId'] = user._id;
+    res.redirect('/index');
   })
 })
 // logs user in, creates session, and redirects to /login
-app.post('/login', function(req, res){
+app.post('/login', function (req, res){
   authenticateUser(req.body.username, req.body.password, function(user){
     if (user) {
-      req.session.name = user.name
-      res.redirect('/login');
+      req.session['username'] = user.username
+      req.session['userId'] = user._id;
+      res.redirect('/index');
     } else {
-      res.json('failure');
+      res.redirect('/');
     }
   });
 })
 
+// logs user out
+app.get('/logout', function(req, res) {
+  req.session.user = false;
+  req.session.userId = false;
+})
 // ajax route handlers
+// oauth
 app.get('/api/oauth', function(req, res) {
   res.json(authorizeUrl);
 });
@@ -118,15 +126,33 @@ app.get('/api/newReleasesTwo', function(req, res) {
   })
 })
 // creates playlist
-app.post('/api/createPlaylist', function(req, res) {
-  playlist = Playlist({name: req.body.name, username: req.session.name, tracks: req.body.tracks});
-  playlist.save(function(err) {
+app.post('/api/createPlaylist/:playlistName', function(req, res) {
+  // playlist = Playlist({name: req.params.playlistName, username: req.session.username, tracks: req.body.playlist});
+  // playlist.save(function(err) {
+  //   if (err) {
+  //     console.log(err);
+  //   }
+  //   console.log('created playlist')
+  // })
+  console.log(req.session)
+  spotifyApi.createPlaylist(req.session.userId, req.params.playlistName, function (err, results) {
     if (err) {
-      console.log(err);
+      console.log(err)
     }
-    console.log('created playlist')
-    res.end();
-  })
+    console.log(results)
+    // var trackIds = [];
+    // req.body.playlist.forEach(function(track) {
+    //   trackIds.push("spotify:track:"+track.track_id);
+    // })
+    // console.log('before spotifyApi tracks')
+    // spotifyApi.addTracksToPlaylist(req.session.userId, results.id, trackIds, function(err, data) {
+    //   if (err) {
+    //     console.log(err)
+    //   }
+    //   console.log(data)
+    //   console.log('anything');
+    // })
+  });
 });
 // gets more info on album
 app.get('/api/album/:id', function(req, res) {

@@ -16,7 +16,9 @@
       <h1>{{album_name}}</h1>
       <h1 id="artist-name">{{artist}}</h1>
       <div id="tracks">
-        {{#each tracks}} {{name}}<button class="add" trackId={{id}} trackName={{name}}>Add to Playlist</button></br>{{/each}}
+        {{#each tracks}} 
+          {{name}}<button class="add" trackId={{id}} trackName='{{name}}'>Add to Playlist</button></br>
+        {{/each}}
       </div>
       <button id="album-back-button" >Back</button>
     </div>
@@ -26,7 +28,9 @@
     <div id="playlist-content">
       <h1>{{playlist_name}}</h1>
       <div id="tracks">
-       {{#each tracks}} {{track_name}} {{track_artist}} <button>Remove</button> </br>{{/each}}
+        {{#each tracks}}
+          <p class="trackP">{{track_name}} {{track_artist}} <button trackId={{track_id}} class="remove-track">Remove</button></p>
+        {{/each}}
       </div>
     <button id="playlist-back-button">Back</button>
   </script>
@@ -35,6 +39,7 @@
   <button id="connect">Connect</button>
   <button id="view-playlist">View Playlist</button>
   <button id="submit-playlist">Submit Playlist</button>
+  <button id="logout">Logout</button>
 
   <div class="grid" id="album-container" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 200 }'></div>
 </body>

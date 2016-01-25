@@ -48,7 +48,7 @@ var scopes = ["playlist-read-private", "playlist-read-collaborative", "streaming
 var authorizeUrl = spotifyApi.createAuthorizeURL(scopes, null);
 
 // mongoose database
-mongoose.connect("mongodb://localhost:27017/spotify");
+mongoose.connect(process.env.MONGOLAB_URI || "mongodb://localhost:27017/spotify");
 var db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error: '))
 db.once('open', function() {

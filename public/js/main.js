@@ -64,7 +64,7 @@ $(document).ready(function() {
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
-              window.open('http://127.0.0.1:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
+              window.open('https://blooming-stream-74013.herokuapp.com/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
             })
           })
         })

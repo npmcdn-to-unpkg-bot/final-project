@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Im making a web app that utilizes the spotify api to render new releases and allow a user to authorize their spotify account and create playlists on behalf of the user.",
   "main": "app.js",
+  "scripts" : {
+    "prestart":"npm install",
+    "start": "node app.js"
+  },
   "dependencies": {
     "bcrypt": "^0.8.5",
     "body-parser": "^1.14.2",

@@ -53,7 +53,7 @@ db.once('open', function() {
 
 app.use(session({
   secret: 'music',
-  store: new MongoStore({url: "mongodb://localhost:27017/spotify"})
+  store: new MongoStore({url: "mongodb://localhost:27017/spotify"}),
   resave: true,
   saveUninitialized: true
 }))

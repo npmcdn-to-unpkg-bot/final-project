@@ -34,7 +34,9 @@ app.set('view engine', 'ejs');
 
 // creates session
 app.use(session({
-  secret: 'music'
+  secret: 'music',
+  resave: true,
+  saveUninitialized: true
 }))
 
 // spotify api

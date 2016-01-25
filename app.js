@@ -7,6 +7,7 @@ var mongoose = require('mongoose');
 var User = require('./models/user.js');
 var session = require('express-session');
 var bcrypt = require('bcrypt');
+var MongoStore = require('connect-mongo')(sessions)
 
 // annas user authentication
 var authenticateUser = function(name, password, callback) {
@@ -32,13 +33,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'ejs');
 
-// creates session
-app.use(session({
-  secret: 'music',
-  resave: true,
-  saveUninitialized: true
-}))
-
 // spotify api
 var spotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new spotifyWebApi({
@@ -56,6 +50,13 @@ db.on('error', console.error.bind(console, 'connection error: '))
 db.once('open', function() {
   console.log('connect4')
 })
+
+app.use(session({
+  secret: 'music',
+  store: new MongoStore({url: "mongodb://localhost:27017/spotify"})
+  resave: true,
+  saveUninitialized: true
+}))
 
 // page route handlers
 app.get('/', function (req, res) {

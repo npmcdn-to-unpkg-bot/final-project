@@ -12,34 +12,62 @@
 <body>
 
   <script id="entry-template" type="text/x-handlebars-template">
-    <div id="album-content">
+    <div class="modal" id="album-content">
       <h1>{{album_name}}</h1>
       <h1 id="artist-name">{{artist}}</h1>
       <div id="tracks">
         {{#each tracks}} 
-          {{name}}<button class="add" trackId={{id}} trackName='{{name}}'>Add to Playlist</button></br>
+          {{name}}<button class="add" trackId={{id}} trackName='{{name}}'>Add to Playlist</button><button class="play-track" track_id='{{id}}'>Play</button></br>
         {{/each}}
       </div>
-      <button id="album-back-button" >Back</button>
+      <button id="back-button">Back</button>
     </div>
   </script>
 
   <script id="entry-template-two" type="text/x-handlebars-template">
-    <div id="playlist-content">
+    <div class="modal" id="playlist-content">
       <h1>{{playlist_name}}</h1>
+      {{#if current}}
+        <label for="playlist-title">Playlist Name: </label>
+        <input id="playlist-title" name="playlist-title" placeholder="Playlist Name">
+        <button id="submit-playlist">Submit Playlist</button>
+      {{/if}}
       <div id="tracks">
         {{#each tracks}}
-          <p class="trackP">{{track_name}} {{track_artist}} <button trackId={{track_id}} class="remove-track">Remove</button></p>
+          <p class="trackP">{{track_name}} {{track_artist}} 
+          {{#if current}}
+            <button track_id={{spotify_id}} class="remove-track">Remove</button>
+          {{/if}}
+          </p>
         {{/each}}
       </div>
-    <button id="playlist-back-button">Back</button>
+      {{#if past}}
+        <button playlist_list='{{playlist_id}}' id="play-playlist">Play</button>
+      {{/if}}
+      <button id="back-button">Back</button>
+    </div>
   </script>
 
-  <h1>New Releases</h1>
-  <button id="connect">Connect</button>
-  <button id="view-playlist">View Playlist</button>
-  <button id="submit-playlist">Submit Playlist</button>
-  <button id="logout">Logout</button>
+  <script id="user-modal-template" type="text/x-handlebars-template">
+    <div class="modal" id="user-modal">
+      <h1>{{user_name}}</h1>
+      <ul>
+        {{#each playlists}}
+          <li class="playlist-modal">{{playlist_name}} <button class="view-playlist-button" playlist={{_id}}>View</button></li>
+        {{/each}}
+      <ul>
+      <button id="back-button">Back</button>
+    </div>
+  </script>
+
+  <img id="spotify-logo" src="/imgs/spotify_logo.png">
+  <h1 id="title-header">New Releases</h1>
+  <div id="button-div">
+    <button class="button" id="connect">Connect</button>
+    <button class="button" id="view-playlist">View Playlist</button>
+    <button class="button" id="my_page">My Page</button>
+    <button class="button" id="logout">Logout</button>
+  </div>
 
   <div class="grid" id="album-container" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 200 }'></div>
 </body>

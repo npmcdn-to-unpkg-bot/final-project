@@ -1,9 +1,24 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 
+var songSchema = mongoose.Schema({
+  spotify_id: String,
+  track_name: String,
+  track_artist: String
+})
+
+var playlistSchema = mongoose.Schema({
+  playlist_name: String,
+  user_name: String,
+  tracks: [songSchema],
+  past: Boolean,
+  spotify_playlist_id: String
+});
+
 var userSchema = mongoose.Schema({
   username: String,
-  password_digest: String
+  password_digest: String,
+  playlists: [playlistSchema]
 })
 userSchema.pre('save', function (next) {
   console.log('saving', this)

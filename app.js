@@ -51,6 +51,7 @@ db.once('open', function() {
   console.log('connect4')
 })
 
+//sessions
 app.use(session({
   secret: 'music',
   store: new MongoStore({url: process.env.MONGOLAB_URI || "mongodb://localhost:27017/spotify"}),

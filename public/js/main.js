@@ -210,7 +210,6 @@ $(document).ready(function() {
         })
         $('#album-container').append(albumImg);
       });
-    // size based on popularity?
     })
   });
   // User modal

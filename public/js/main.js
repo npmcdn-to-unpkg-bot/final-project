@@ -19,8 +19,20 @@ $(document).ready(function() {
   }).done(function(results){
     parsedResults = JSON.parse(results)
     albums = parsedResults.albums.items
-    console.log(albums)
-    albums.forEach(function(album) {
+    newAlbums = [];
+    // stack overflow (come back to this)
+    // albums.sort( function( a, b){ return a.id - b.id; } );
+
+    // delete all duplicates from the array
+    for( var i=0; i<albums.length-1; i++ ) {
+      if (!(albums[i].name == albums[i+1].name)) {
+        newAlbums.push(albums[i]);
+      }
+    }
+    //end of stack overflow
+
+    console.log(newAlbums)
+    newAlbums.forEach(function(album) {
       $.ajax({
         url: '/api/album/'+album.id,
         type: 'GET',
@@ -64,7 +76,7 @@ $(document).ready(function() {
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
-              window.open('https://blooming-stream-74013.herokuapp.com/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
+              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
             })
           })
         })
@@ -80,8 +92,14 @@ $(document).ready(function() {
   }).done(function(results){
     parsedResults = JSON.parse(results)
     albums = parsedResults.albums.items
-    console.log(albums)
-    albums.forEach(function(album) {
+    newAlbums = [];
+    for( var i=0; i<albums.length-1; i++ ) {
+      if (!(albums[i].name == albums[i+1].name)) {
+        newAlbums.push(albums[i]);
+      }
+    }
+    console.log(newAlbums)
+    newAlbums.forEach(function(album) {
       // individual albums ajax
       $.ajax({
         url: '/api/album/'+album.id,
@@ -122,7 +140,71 @@ $(document).ready(function() {
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
-              window.open('https://blooming-stream-74013.herokuapp.com/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
+              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
+            })
+          })
+        })
+        $('#album-container').append(albumImg);
+      });
+    // size based on popularity?
+    })
+  });
+  $.ajax({
+    url: '/api/newReleasesThree',
+    type: 'GET',
+    dataType: 'json'
+  }).done(function(results){
+    parsedResults = JSON.parse(results)
+    albums = parsedResults.albums.items
+    newAlbums = [];
+    for( var i=0; i<albums.length-1; i++ ) {
+      if (!(albums[i].name == albums[i+1].name)) {
+        newAlbums.push(albums[i]);
+      }
+    }
+    console.log(newAlbums)
+    newAlbums.forEach(function(album) {
+      // individual albums ajax
+      $.ajax({
+        url: '/api/album/'+album.id,
+        type: 'GET',
+        dataType: 'json'
+      }).done(function(album) {
+        albumImg = $('<img>').attr('src', album.images[1].url).addClass('grid-item').on('click', function() {
+          $.ajax({
+            url: '/api/album/'+album.id,
+            type: 'GET',
+            dataType: 'json'
+          }).done(function(album) {
+            // modals with handlebars
+            if ($('.modal')) {
+              $('.modal').remove();
+            }
+            artist = album.artists[0].name;
+            tracks = album.tracks.items;
+            var source = $("#entry-template").html();
+            var template = Handlebars.compile(source);
+            var context = {album_name: album.name, tracks: tracks, artist: artist};
+            var html = template(context);
+            var shadow = $('<div>').addClass('shadow');
+            $('body').append(shadow);
+            $('body').append(html);
+            $('.shadow').on('click', function() {
+              $('.modal').remove();
+              $('.shadow').remove();
+            })
+            $("#back-button").on('click', function() {
+              $('.modal').remove();
+              $('.shadow').remove();
+            })
+            $(".add").on('click', function(event) {
+              track_id = event.target.getAttribute('trackId');
+              artist = $('#artist-name').text();
+              track_name = event.target.getAttribute('trackName');
+              currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
+            })
+            $('.play-track').on('click', function(event) {
+              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
             })
           })
         })
@@ -195,7 +277,7 @@ $(document).ready(function() {
               dataType: 'json'
             }).done(function(results) {
               console.log(results)
-              window.open('https://blooming-stream-74013.herokuapp.com/api/player/'+event.target.getAttribute('playlist_list'), 'musicPlayer', "height=300,width=380")
+              window.open('http://localhost:3000/api/player/'+event.target.getAttribute('playlist_list'), 'musicPlayer', "height=300,width=380")
             })
           })
         })
@@ -307,7 +389,7 @@ $(document).ready(function() {
       type: 'GET',
       dataType: 'json'
     }).done(
-      location.href='https://blooming-stream-74013.herokuapp.com/'
+      location.href='http://localhost:3000/'
     )
   })
   // grid stuff

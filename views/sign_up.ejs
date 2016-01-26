@@ -2,13 +2,23 @@
 <html>
 <head>
   <title>Sign Up</title>
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
 </head>
 <body>
-  <h1>Sign Up</h1>
-  <form method="POST" action='/users'>
-    <input type="text" name="username">
-    <input type="password" name="password">
-    <input type="submit" value="Sign Up">
-  </form>
+  <div class="modal">
+    <h1 id="login-header">Sign Up</h1>
+    <form method="POST" action='/users'>
+      <div class="login-input">
+        <label for="sign-up-username">Username: </label>
+        <input id="sign-up-username" type="text" name="username" placeholder="Username">
+      </div>
+      <div class="login-input">
+        <label for="sign-up-password">Password:</label>
+        <input id="sign-up-password" type="password" name="password" placeholder="Password">
+      </div>
+      <input id="login-submit-button" type="submit" value="Sign Up">
+    </form>
+    <a id="spotify-anchor" href="https://www.spotify.com/us/">This Web App requires A Spotify Account. Not a member? Sign up!</a>
+  </div>
 </body>
 </html>

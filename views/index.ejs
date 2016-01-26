@@ -13,25 +13,24 @@
 
   <script id="entry-template" type="text/x-handlebars-template">
     <div class="modal" id="album-content">
-      <h1>{{album_name}}</h1>
+      <h1 id="playlist-header">{{album_name}}</h1>
       <h1 id="artist-name">{{artist}}</h1>
       <div id="tracks">
-        {{#each tracks}} 
-          {{name}}<button class="add" trackId={{id}} trackName='{{name}}'>Add to Playlist</button><button class="play-track" track_id='{{id}}'>Play</button></br>
+        {{#each tracks}}
+          <p class="trackP">
+            {{name}}<button class="add" trackId={{id}} trackName='{{name}}'>Add to Playlist</button><button class="play-track" track_id='{{id}}'>Play</button>
+          </p>
         {{/each}}
       </div>
-      <button id="back-button">Back</button>
+      <div id="playlist-button-div">
+        <button id="back-button">Back</button>
+      </div>
     </div>
   </script>
 
   <script id="entry-template-two" type="text/x-handlebars-template">
     <div class="modal" id="playlist-content">
-      <h1>{{playlist_name}}</h1>
-      {{#if current}}
-        <label for="playlist-title">Playlist Name: </label>
-        <input id="playlist-title" name="playlist-title" placeholder="Playlist Name">
-        <button id="submit-playlist">Submit Playlist</button>
-      {{/if}}
+      <h1 id="playlist-header">{{playlist_name}}</h1>
       <div id="tracks">
         {{#each tracks}}
           <p class="trackP">{{track_name}} {{track_artist}} 
@@ -41,10 +40,21 @@
           </p>
         {{/each}}
       </div>
-      {{#if past}}
-        <button playlist_list='{{playlist_id}}' id="play-playlist">Play</button>
-      {{/if}}
-      <button id="back-button">Back</button>
+      <div id="playlist-button-div">
+        {{#if past}}
+          <button playlist_list='{{playlist_id}}' id="play-playlist">Play</button>
+        {{/if}}
+        {{#if current}}
+          <div id="playlist-input-div">
+            <label for="playlist-title">Playlist Name: </label>
+            <input id="playlist-title" name="playlist-title" placeholder="Playlist Name">
+          </div>
+          </br>
+          <button id="submit-playlist">Submit Playlist</button>
+        {{/if}}
+        </br>
+        <button id="back-button">Back</button>
+      </div>
     </div>
   </script>
 
@@ -63,9 +73,9 @@
   <img id="spotify-logo" src="/imgs/spotify_logo.png">
   <h1 id="title-header">New Releases</h1>
   <div id="button-div">
-    <button class="button" id="connect">Connect</button>
-    <button class="button" id="view-playlist">View Playlist</button>
     <button class="button" id="my_page">My Page</button>
+    <button class="button" id="view-playlist">Current Playlist</button>
+    <button class="button" id="connect">Reconnect</button>
     <button class="button" id="logout">Logout</button>
   </div>
 

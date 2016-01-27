@@ -77,7 +77,7 @@ app.get('/index', function (req, res) {
 })
 // renders sign up form
 app.get('/users/new', function (req, res) {
-  res.render('sign_up')
+  res.render('/index')
 })
 // creates user and redirects to login
 app.post('/users', function (req, res) {

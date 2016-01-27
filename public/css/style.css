@@ -85,20 +85,17 @@ body {
 }
 
 #button-div {
-  position: fixed;
+  position: absolute;
   top: 0;
   right: 0;
   display: block;
-  width: 210px;
+  width: 250px;
   height: 100px;
 }
-.button {
-  margin: .95em;
-  margin-top: 1.4em;
-  border-radius: 10px;
-  background-color: rgb(29, 214, 94);
-}
 
+.sgreen {
+  color: rgb(29, 214, 94);
+}
 /*.button {
   background: #1dd55e;
   background-image: -webkit-linear-gradient(top, #1dd55e, #1dff5d);

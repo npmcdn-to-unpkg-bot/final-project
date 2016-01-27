@@ -7,7 +7,6 @@ var mongoose = require('mongoose');
 var User = require('./models/user.js');
 var session = require('express-session');
 var bcrypt = require('bcrypt');
-var MongoStore = require('connect-mongo')(session)
 
 // annas user authentication
 var authenticateUser = function(name, password, callback) {
@@ -43,25 +42,22 @@ var spotifyApi = new spotifyWebApi({
 var scopes = ["playlist-read-private", "playlist-read-collaborative", "streaming", "playlist-modify-public", "playlist-modify-private", "user-follow-modify", "user-read-email", "user-library-read"];
 var authorizeUrl = spotifyApi.createAuthorizeURL(scopes, null);
 
+app.use(session({
+  secret: 'music',
+}))
 // mongoose database
-mongoose.connect(process.env.MONGOLAB_URI || "mongodb://localhost:27017/spotify");
+mongoose.connect("mongodb://localhost:27017/spotify");
 var db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error: '))
 db.once('open', function() {
-  console.log('connect4')
+  console.log('connect4');
 })
-
-app.use(session({
-  secret: 'music',
-  store: new MongoStore({url: process.env.MONGOLAB_URI || "mongodb://localhost:27017/spotify"}),
-  resave: true,
-  saveUninitialized: true
-}))
 
 // page route handlers
 app.get('/', function (req, res) {
   res.render('login');
 });
+
 // renders dashboard?
 app.get('/index', function (req, res) {
   if (req.query.code) {
@@ -74,10 +70,12 @@ app.get('/index', function (req, res) {
   }
   res.render('index')
 })
+
 // renders sign up form
 app.get('/users/new', function (req, res) {
   res.render('sign_up')
 })
+
 // creates user and redirects to login
 app.post('/users', function (req, res) {
   User.createDigestAndSave({username: req.body.username, password: req.body.password}, function(user) {
@@ -86,11 +84,12 @@ app.post('/users', function (req, res) {
     res.redirect('/index');
   })
 })
+
 // logs user in, creates session, and redirects to /login
 app.post('/login', function (req, res){
   authenticateUser(req.body.username, req.body.password, function(user){
     if (user) {
-      req.session['username'] = user.username
+      req.session['username'] = user.username;
       req.session['userId'] = user._id;
       res.redirect(authorizeUrl);
     } else {
@@ -104,11 +103,13 @@ app.get('/logout', function(req, res) {
   req.session.user = false;
   req.session.userId = false;
 })
+
 // ajax route handlers
 // oauth
 app.get('/api/oauth', function(req, res) {
   res.json(authorizeUrl);
 });
+
 // grabs 1st 20 new releases
 app.get('/api/newReleases', function(req, res) {
   request('https://api.spotify.com/v1/search?q=tag:new&type=album', function(err, results) {
@@ -138,10 +139,12 @@ app.get('/api/newReleasesThree', function(req, res) {
 })
 // gets user info
 app.get('/api/getUser', function(req, res) {
+  console.log(req.session)
   User.findOne({username: req.session['username']}, function (err, user) {
     if (err) {
       console.log(err);
     }
+    console.log(user);
     res.json(user);
   })
 })

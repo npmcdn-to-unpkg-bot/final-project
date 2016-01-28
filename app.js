@@ -7,7 +7,7 @@ var mongoose = require('mongoose');
 var User = require('./models/user.js');
 var session = require('express-session');
 var bcrypt = require('bcrypt');
-var MongoStore = require('connect-mongo')(session)
+var MongoStore = require('connect-mongo')(session);
 
 // annas user authentication
 var authenticateUser = function(name, password, callback) {

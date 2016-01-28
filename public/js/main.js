@@ -76,7 +76,7 @@ $(document).ready(function() {
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
-              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
+              window.open('https://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
             })
           })
         })
@@ -140,7 +140,7 @@ $(document).ready(function() {
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
-              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
+              window.open('https://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
             })
           })
         })
@@ -204,13 +204,12 @@ $(document).ready(function() {
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
-              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
+              window.open('https://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=300,width=380")
             })
           })
         })
         $('#album-container').append(albumImg);
       });
-    // size based on popularity?
     })
   });
   // User modal
@@ -277,7 +276,7 @@ $(document).ready(function() {
               dataType: 'json'
             }).done(function(results) {
               console.log(results)
-              window.open('http://localhost:3000/api/player/'+event.target.getAttribute('playlist_list'), 'musicPlayer', "height=300,width=380")
+              window.open('https://localhost:3000/api/player/'+event.target.getAttribute('playlist_list'), 'musicPlayer', "height=300,width=380")
             })
           })
         })

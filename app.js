@@ -38,7 +38,7 @@ var spotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new spotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
   clientSecret: process.env.SPOTIFY_SECRET,
-  redirectUri: 'http://localhost:3000/index'
+  redirectUri: 'https://blooming-stream-74013.herokuapp.com/index'
 });
 var scopes = ["playlist-read-private", "playlist-read-collaborative", "streaming", "playlist-modify-public", "playlist-modify-private", "user-follow-modify", "user-read-email", "user-library-read"];
 var authorizeUrl = spotifyApi.createAuthorizeURL(scopes, null);

@@ -70,6 +70,7 @@ body {
   width: 100px;
   display: block;
   float: left;
+  margin-left: 15px;
 }
 
 #title-header {

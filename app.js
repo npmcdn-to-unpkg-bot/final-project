@@ -77,14 +77,14 @@ app.get('/index', function (req, res) {
 })
 // renders sign up form
 app.get('/users/new', function (req, res) {
-  res.render('/index')
+  res.render('sign_up')
 })
 // creates user and redirects to login
 app.post('/users', function (req, res) {
   User.createDigestAndSave({username: req.body.username, password: req.body.password}, function(user) {
     req.session['username'] = user.username;
     req.session['userId'] = user._id;
-    res.redirect('/index');
+    res.redirect(authorizeUrl);
   })
 })
 // logs user in, creates session, and redirects to /login

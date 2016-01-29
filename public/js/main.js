@@ -69,10 +69,10 @@ $(document).ready(function() {
               $('.modal').remove();
               $('.shadow').remove();
             })
-            $(".add").on('click', function(event) {
-              track_id = event.target.getAttribute('trackId');
+            $(".add-button").on('click', function(event) {
+              track_id = event.target.getAttribute('track_id');
               artist = $('#artist-name').text();
-              track_name = event.target.getAttribute('trackName');
+              track_name = event.target.getAttribute('track_name');
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
@@ -133,10 +133,10 @@ $(document).ready(function() {
               $('.modal').remove();
               $('.shadow').remove();
             })
-            $(".add").on('click', function(event) {
-              track_id = event.target.getAttribute('trackId');
+            $(".add-button").on('click', function(event) {
+              track_id = event.target.getAttribute('track_id');
               artist = $('#artist-name').text();
-              track_name = event.target.getAttribute('trackName');
+              track_name = event.target.getAttribute('track_name');
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
@@ -197,10 +197,10 @@ $(document).ready(function() {
               $('.modal').remove();
               $('.shadow').remove();
             })
-            $(".add").on('click', function(event) {
-              track_id = event.target.getAttribute('trackId');
+            $(".add-button").on('click', function(event) {
+              track_id = event.target.getAttribute('track_id');
               artist = $('#artist-name').text();
-              track_name = event.target.getAttribute('trackName');
+              track_name = event.target.getAttribute('track_name');
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
@@ -268,14 +268,13 @@ $(document).ready(function() {
             $('.modal').remove();
             $('.shadow').remove();
           })
-          $("#play-playlist").on('click', function(event) {
-            console.log(event.target.getAttribute('playlist-id'));
+          $(".play-playlist").on('click', function(event) {
+            console.log(event.target.getAttribute('playlist_id'));
             $.ajax({
               url: 'api/getUser/spotify',
               type: 'GET',
               dataType: 'json'
             }).done(function(results) {
-              console.log(results)
               window.open('https://blooming-stream-74013.herokuapp.com/api/player/'+event.target.getAttribute('playlist_list'), 'musicPlayer', "height=300,width=380")
             })
           })
@@ -327,6 +326,11 @@ $(document).ready(function() {
         $('.modal').remove();
         $('.shadow').remove();
       })
+      $('#delete-button').on('click', function() {
+        currentPlaylist = [];
+        $('.modal').remove();
+        $('.shadow').remove();
+      })
       $('#submit-playlist').on('click', function() {
         if ($('playlist-title').val() === '') {
           event.preventDefault();
@@ -352,6 +356,12 @@ $(document).ready(function() {
       })
     })
     $("#back-button").on('click', function() {
+      $('.modal').remove();
+      $('.shadow').remove();
+    })
+    // dump current playlist
+    $('.delete-button').on('click', function() {
+      currentPlaylist = [];
       $('.modal').remove();
       $('.shadow').remove();
     })

@@ -6,6 +6,7 @@
   <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
   <script type="text/javascript" src="bower_components/handlebars/handlebars.min.js"></script>
   <script type="text/javascript" src="bower_components/masonry/dist/masonry.pkgd.js"></script>
+  <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.css">
   <script type="text/javascript" src="js/main.js"></script>
   <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
@@ -17,13 +18,23 @@
       <h1 id="artist-name">{{artist}}</h1>
       <div id="tracks">
         {{#each tracks}}
-          <p class="trackP">
-            {{name}}<button class="add" trackId={{id}} trackName='{{name}}'>Add to Playlist</button><button class="play-track" track_id='{{id}}'>Play</button>
+          <p class="track-p">
+            {{name}}
+            <div class="ui icon buttons button-div">
+              <button track_id={{id}} track_name='{{name}}' class="ui play-track button my-button">
+                <i track_id={{id}} track_name='{{name}}' class="small play icon my-icon"></i>
+              </button>
+              <button track_id={{id}} track_name='{{name}}' class="ui add-button button my-button">
+                <i track_id={{id}} track_name='{{name}}' class="small add icon my-icon"></i>
+              </button>
+            </div>
           </p>
         {{/each}}
       </div>
       <div id="playlist-button-div">
-        <button id="back-button">Back</button>
+        <button id="back-button" class="circular ui icon button">
+          <i class="small left arrow icon"></i>
+        </button>
       </div>
     </div>
   </script>
@@ -33,50 +44,74 @@
       <h1 id="playlist-header">{{playlist_name}}</h1>
       <div id="tracks">
         {{#each tracks}}
-          <p class="trackP">{{track_name}} {{track_artist}} 
+          <p class="track-p">{{track_name}} {{track_artist}}</p>
           {{#if current}}
-            <button track_id={{spotify_id}} class="remove-track">Remove</button>
+            <div class="button-div">
+              <button track_id={{spotify_id}} class="small remove-track circular ui icon negative button">
+                <i class="small remove-track remove icon"></i>
+              </button>
+            </div>
           {{/if}}
-          </p>
         {{/each}}
       </div>
       <div id="playlist-button-div">
         {{#if past}}
-          <button playlist_list='{{playlist_id}}' id="play-playlist">Play</button>
+          <div class="play-playlist-div">
+            <button playlist_id={{playlist_id}} class="play-playlist ui labeled icon button">
+              <i playlist_id={{playlist_id}} class="play icon"></i>
+              Play
+            </button>
+          </div>
         {{/if}}
         {{#if current}}
           <div id="playlist-input-div">
-            <label for="playlist-title">Playlist Name: </label>
+            <label id="playlist-label" for="playlist-title">Playlist Name: </label>
             <input id="playlist-title" name="playlist-title" placeholder="Playlist Name">
           </div>
           </br>
-          <button id="submit-playlist">Submit Playlist</button>
+          <div id="playlist-submit-div" class="ui buttons">
+            <button class="delete-button ui button">Delete</button>
+            <div class="or"></div>
+            <button id="submit-playlist" class="ui positive button">Submit</button>
+          </div>
         {{/if}}
         </br>
-        <button id="back-button">Back</button>
+        <button id="back-button" class="circular ui icon button">
+          <i class="small left arrow icon"></i>
+        </button>
       </div>
     </div>
   </script>
 
   <script id="user-modal-template" type="text/x-handlebars-template">
     <div class="modal" id="user-modal">
-      <h1>{{user_name}}</h1>
-      <ul>
+      <h1 id="playlist-header">{{user_name}}</h1>
+      <div id="tracks-two">
         {{#each playlists}}
-          <li class="playlist-modal">{{playlist_name}} <button class="view-playlist-button" playlist={{_id}}>View</button></li>
+          <p class="playlist-modal-p">
+            {{playlist_name}}
+            
+          </p>
+          <div class="view-button-div">
+            <button class="view-playlist-button small circular ui icon button" playlist={{_id}}>
+              <i playlist={{_id}} class="unhide icon"></i>
+            </button>
+          </div>
         {{/each}}
-      <ul>
-      <button id="back-button">Back</button>
+      </div>
+      <button id="back-button" class="circular ui icon button">
+        <i class="small left arrow icon"></i>
+      </button>
     </div>
   </script>
 
   <img id="spotify-logo" src="/imgs/spotify_logo.png">
   <h1 id="title-header">New Releases</h1>
   <div id="button-div">
-    <button class="button" id="my_page">My Page</button>
-    <button class="button" id="view-playlist">Current Playlist</button>
-    <button class="button" id="connect">Reconnect</button>
-    <button class="button" id="logout">Logout</button>
+    <button class="ui inverted green button sgreen" id="my_page">My Page</button>
+    <button class="ui inverted green button sgreen" id="view-playlist">Current Playlist</button>
+    <button class="ui inverted green button sgreen" id="connect">Reconnect</button>
+    <button class="ui inverted green button sgreen" id="logout">Logout</button>
   </div>
 
   <div class="grid" id="album-container" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 200 }'></div>

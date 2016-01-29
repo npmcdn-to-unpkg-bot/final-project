@@ -18,13 +18,23 @@
       <h1 id="artist-name">{{artist}}</h1>
       <div id="tracks">
         {{#each tracks}}
-          <p class="trackP">
-            {{name}}<button class="add" trackId={{id}} trackName='{{name}}'>Add to Playlist</button><button class="play-track" track_id='{{id}}'>Play</button>
+          <p class="track-p">
+            {{name}}
+            <div class="ui icon buttons button-div">
+              <button track_id={{id}} track_name='{{name}}' class="ui play-track button my-button">
+                <i track_id={{id}} track_name='{{name}}' class="small play icon my-icon"></i>
+              </button>
+              <button track_id={{id}} track_name='{{name}}' class="ui add-button button my-button">
+                <i track_id={{id}} track_name='{{name}}' class="small add icon my-icon"></i>
+              </button>
+            </div>
           </p>
         {{/each}}
       </div>
       <div id="playlist-button-div">
-        <button id="back-button">Back</button>
+        <button id="back-button" class="circular ui icon button">
+          <i class="small left arrow icon"></i>
+        </button>
       </div>
     </div>
   </script>
@@ -34,40 +44,64 @@
       <h1 id="playlist-header">{{playlist_name}}</h1>
       <div id="tracks">
         {{#each tracks}}
-          <p class="trackP">{{track_name}} {{track_artist}} 
+          <p class="track-p">{{track_name}} {{track_artist}}</p>
           {{#if current}}
-            <button track_id={{spotify_id}} class="remove-track">Remove</button>
+            <div class="button-div">
+              <button track_id={{spotify_id}} class="small remove-track circular ui icon negative button">
+                <i class="small remove-track remove icon"></i>
+              </button>
+            </div>
           {{/if}}
-          </p>
         {{/each}}
       </div>
       <div id="playlist-button-div">
         {{#if past}}
-          <button playlist_list='{{playlist_id}}' id="play-playlist">Play</button>
+          <div class="play-playlist-div">
+            <button playlist_id={{playlist_id}} class="play-playlist ui labeled icon button">
+              <i playlist_id={{playlist_id}} class="play icon"></i>
+              Play
+            </button>
+          </div>
         {{/if}}
         {{#if current}}
           <div id="playlist-input-div">
-            <label for="playlist-title">Playlist Name: </label>
+            <label id="playlist-label" for="playlist-title">Playlist Name: </label>
             <input id="playlist-title" name="playlist-title" placeholder="Playlist Name">
           </div>
           </br>
-          <button id="submit-playlist">Submit Playlist</button>
+          <div id="playlist-submit-div" class="ui buttons">
+            <button class="delete-button ui button">Delete</button>
+            <div class="or"></div>
+            <button id="submit-playlist" class="ui positive button">Submit</button>
+          </div>
         {{/if}}
         </br>
-        <button id="back-button">Back</button>
+        <button id="back-button" class="circular ui icon button">
+          <i class="small left arrow icon"></i>
+        </button>
       </div>
     </div>
   </script>
 
   <script id="user-modal-template" type="text/x-handlebars-template">
     <div class="modal" id="user-modal">
-      <h1>{{user_name}}</h1>
-      <ul>
+      <h1 id="playlist-header">{{user_name}}</h1>
+      <div id="tracks-two">
         {{#each playlists}}
-          <li class="playlist-modal">{{playlist_name}} <button class="view-playlist-button" playlist={{_id}}>View</button></li>
+          <p class="playlist-modal-p">
+            {{playlist_name}}
+            
+          </p>
+          <div class="view-button-div">
+            <button class="view-playlist-button small circular ui icon button" playlist={{_id}}>
+              <i playlist={{_id}} class="unhide icon"></i>
+            </button>
+          </div>
         {{/each}}
-      <ul>
-      <button id="back-button">Back</button>
+      </div>
+      <button id="back-button" class="circular ui icon button">
+        <i class="small left arrow icon"></i>
+      </button>
     </div>
   </script>
 

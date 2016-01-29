@@ -329,6 +329,8 @@ $(document).ready(function() {
       })
       $('#delete-button').on('click', function() {
         currentPlaylist = [];
+        $('.modal').remove();
+        $('.shadow').remove();
       })
       $('#submit-playlist').on('click', function() {
         if ($('playlist-title').val() === '') {
@@ -361,6 +363,8 @@ $(document).ready(function() {
     // dump current playlist
     $('.delete-button').on('click', function() {
       currentPlaylist = [];
+      $('.modal').remove();
+      $('.shadow').remove();
     })
     // create playlist
     $('#submit-playlist').on('click', function() {

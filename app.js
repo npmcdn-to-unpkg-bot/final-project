@@ -38,7 +38,7 @@ var spotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new spotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
   clientSecret: process.env.SPOTIFY_SECRET,
-  redirectUri: 'https://blooming-stream-74013.herokuapp.com/index'
+  redirectUri: 'http://localhost:3000/index'
 });
 var scopes = ["playlist-read-private", "playlist-read-collaborative", "streaming", "playlist-modify-public", "playlist-modify-private", "user-follow-modify", "user-read-email", "user-library-read"];
 var authorizeUrl = spotifyApi.createAuthorizeURL(scopes, null);
@@ -116,27 +116,40 @@ app.get('/api/newReleases', function(req, res) {
     if (err) {
       console.log(err);
     }
-    res.json(results.body);
+    res.write(results.body);
   })
-})
-// grabs 2nd 20 new releases
-app.get('/api/newReleasesTwo', function(req, res) {
   request('https://api.spotify.com/v1/search?q=tag:new&type=album&offset=20', function(err, results) {
     if (err) {
       console.log(err);
     }
-    res.json(results.body);
+    res.write(results.body);
   })
-})
-// grabs 3rd 20 new releases
-app.get('/api/newReleasesThree', function(req, res) {
   request('https://api.spotify.com/v1/search?q=tag:new&type=album&offset=40', function(err, results) {
     if (err) {
       console.log(err);
     }
-    res.json(results.body);
+    res.write(results.body);
   })
+  res.send()
 })
+// grabs 2nd 20 new releases
+// app.get('/api/newReleasesTwo', function(req, res) {
+//   request('https://api.spotify.com/v1/search?q=tag:new&type=album&offset=20', function(err, results) {
+//     if (err) {
+//       console.log(err);
+//     }
+//     res.json(results.body);
+//   })
+// })
+// grabs 3rd 20 new releases
+// app.get('/api/newReleasesThree', function(req, res) {
+//   request('https://api.spotify.com/v1/search?q=tag:new&type=album&offset=40', function(err, results) {
+//     if (err) {
+//       console.log(err);
+//     }
+//     res.json(results.body);
+//   })
+// })
 // gets user info
 app.get('/api/getUser', function(req, res) {
   User.findOne({username: req.session['username']}, function (err, user) {

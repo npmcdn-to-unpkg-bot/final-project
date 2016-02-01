@@ -76,7 +76,7 @@ $(document).ready(function() {
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
-              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=380")
+              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=350,background=black")
             })
           })
         })
@@ -140,7 +140,7 @@ $(document).ready(function() {
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
-              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=380")
+              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=350,background=black")
             })
           })
         })
@@ -204,7 +204,7 @@ $(document).ready(function() {
               currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
             })
             $('.play-track').on('click', function(event) {
-              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=380")
+              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=350,background=black")
             })
           })
         })
@@ -248,7 +248,7 @@ $(document).ready(function() {
           },
           dataType: 'json'
         }).done(function(results) {
-          console.log(results)
+          var spotify_play_id = results.spotify_playlist_id;
           if ($('.modal')) {
             $('.modal').remove();
             $('.shadow').remove();
@@ -269,14 +269,14 @@ $(document).ready(function() {
             $('.shadow').remove();
           })
           $(".play-playlist").on('click', function(event) {
-            console.log(event.target.getAttribute('playlist_id'));
             $.ajax({
               url: 'api/getUser/spotify',
               type: 'GET',
               dataType: 'json'
             }).done(function(results) {
-              console.log(results)
-              window.open('http://localhost:3000/api/player/'+event.target.getAttribute('playlist_id'), 'musicPlayer', "height=300,width=380")
+              console.log(results);
+              console.log(spotify_play_id);
+              window.open('http://localhost:3000/api/player/'+spotify_play_id, 'musicPlayer', "height=300,width=380")
             })
           })
         })

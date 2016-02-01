@@ -1,3 +1,8 @@
-# final-project
+# New Releases
 
-  Im making a web app that utilizes the spotify api to render new releases and allow a user to authorize their spotify account and create playlists on behalf of the user.
+New releases is a Web app that lets users create and listen to playlists using the Spotify Api.
+
+Technologies Used
+  - Node.js
+  - Spotify Api
+  - Mongo

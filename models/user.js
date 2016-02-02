@@ -41,4 +41,23 @@ userSchema.statics.createDigestAndSave = function(user, callback) {
   })
 }
 
+userSchema.statics.authenticateUser = function(name, password, callback) {
+  var User = this;
+  User.findOne({username: name}, function(err, user){
+    console.log(arguments);
+    if (err) {
+      console.log(err);
+    }
+    if (user) {
+      bcrypt.compare(password, user.password_digest, function (err, results) {
+        if (results) {
+          callback(user);
+        } else {
+          callback(false);
+        }
+      })
+    }
+  });
+};
+
 module.exports = mongoose.model('User', userSchema);

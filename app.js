@@ -8,25 +8,7 @@ var User = require('./models/user.js');
 var session = require('express-session');
 var bcrypt = require('bcrypt');
 var MongoStore = require('connect-mongo')(session);
-
-// annas user authentication
-var authenticateUser = function(name, password, callback) {
-  User.findOne({username: name}, function(err, user){
-    console.log(arguments);
-    if (err) {
-      console.log(err);
-    }
-    if (user) {
-      bcrypt.compare(password, user.password_digest, function (err, results) {
-        if (results) {
-          callback(user);
-        } else {
-          callback(false);
-        }
-      })
-    }
-  });
-};
+var waterfall = require('async-waterfall');
 
 // app config
 app.use(bodyParser.urlencoded({extended: true}));
@@ -45,11 +27,11 @@ var authorizeUrl = spotifyApi.createAuthorizeURL(scopes, null);
 
 // mongoose database
 mongoose.connect(process.env.MONGOLAB_URI || "mongodb://localhost:27017/spotify");
-var db = mongoose.connection
-db.on('error', console.error.bind(console, 'connection error: '))
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error: '));
 db.once('open', function() {
-  console.log('connect4')
-})
+  console.log('Connected to Mongo');
+});
 
 //sessions
 app.use(session({
@@ -57,7 +39,7 @@ app.use(session({
   store: new MongoStore({url: process.env.MONGOLAB_URI || "mongodb://localhost:27017/spotify"}),
   resave: true,
   saveUninitialized: true
-}))
+}));
 
 // page route handlers
 app.get('/', function (req, res) {
@@ -68,43 +50,43 @@ app.get('/index', function (req, res) {
   if (req.query.code) {
     var code = req.query.code;
     spotifyApi.authorizationCodeGrant(code, function(err, results){
-      req.session['spotify_access_token'] = results.body['access_token']
+      req.session['spotify_access_token'] = results.body['access_token'];
       spotifyApi.setAccessToken(results.body['access_token']);
       spotifyApi.setRefreshToken(results.body['refresh_token']);
-    })
-  }
-  res.render('index')
-})
+    });
+  };
+  res.render('index');
+});
 // renders sign up form
 app.get('/users/new', function (req, res) {
-  res.render('sign_up')
-})
+  res.render('sign_up');
+});
 // creates user and redirects to login
 app.post('/users', function (req, res) {
   User.createDigestAndSave({username: req.body.username, password: req.body.password}, function(user) {
     req.session['username'] = user.username;
     req.session['userId'] = user._id;
     res.redirect(authorizeUrl);
-  })
-})
+  });
+});
 // logs user in, creates session, and redirects to /login
 app.post('/login', function (req, res){
-  authenticateUser(req.body.username, req.body.password, function(user){
+  User.authenticateUser(req.body.username, req.body.password, function(user){
     if (user) {
-      req.session['username'] = user.username
+      req.session['username'] = user.username;
       req.session['userId'] = user._id;
       res.redirect(authorizeUrl);
     } else {
       res.redirect('/');
-    }
+    };
   });
-})
+});
 
 // logs user out
 app.get('/logout', function(req, res) {
   req.session.user = false;
   req.session.userId = false;
-})
+});
 // ajax route handlers
 // oauth
 app.get('/api/oauth', function(req, res) {
@@ -112,107 +94,113 @@ app.get('/api/oauth', function(req, res) {
 });
 // grabs 1st 20 new releases
 app.get('/api/newReleases', function(req, res) {
-  request('https://api.spotify.com/v1/search?q=tag:new&type=album', function(err, results) {
+//   waterfall([
+//     function(callback) {
+//       request('https://api.spotify.com/v1/search?q=tag:new&type=album', function(err, results) {
+//         if (err) {
+//           console.log(err);
+//         }
+//         callback(null, results);
+//       })
+//     },
+//     function(arg1, callback) {
+//       request('https://api.spotify.com/v1/search?q=tag:new&type=album&offset=20', function(err, results) {
+//         if (err) {
+//           console.log(err);
+//         }
+//         callback(null, arg1, results)
+//       })
+//     },
+//     function(arg1, arg2, callback) {
+//       request('https://api.spotify.com/v1/search?q=tag:new&type=album&offset=40', function(err, results) {
+//         if (err) {
+//           console.log(err);
+//         }
+//         callback(null, arg1, arg2, results)
+//       })
+//     }
+//   ],
+//   function(err, arg1, arg2, arg3) {
+//     albums = [arg1, arg2, arg3];
+//     res.json(albums);
+//   }) 
+// })
+  request('https://api.spotify.com/v1/search?q=tag:new&type=album&limit=50', function(err, results) {
     if (err) {
       console.log(err);
-    }
+    };
     res.json(results.body);
-  })
-})
-// grabs 2nd 20 new releases
-app.get('/api/newReleasesTwo', function(req, res) {
-  request('https://api.spotify.com/v1/search?q=tag:new&type=album&offset=20', function(err, results) {
-    if (err) {
-      console.log(err);
-    }
-    res.json(results.body);
-  })
-})
-// grabs 3rd 20 new releases
-app.get('/api/newReleasesThree', function(req, res) {
-  request('https://api.spotify.com/v1/search?q=tag:new&type=album&offset=40', function(err, results) {
-    if (err) {
-      console.log(err);
-    }
-    res.json(results.body);
-  })
-})
-// gets user info
+  });
+});
+
 app.get('/api/getUser', function(req, res) {
   User.findOne({username: req.session['username']}, function (err, user) {
     if (err) {
       console.log(err);
-    }
+    };
     res.json(user);
-  })
-})
+  });
+});
 
 // gets spotify user info
 app.get('/api/getUser/spotify', function(req, res) {
   spotifyApi.getMe(function(err, data) {
     if (err) {
-      console.log(err)
-    }
+      console.log(err);
+    };
     res.json(data);
-  })
-})
+  });
+});
 
 // get playlist info
 app.post('/api/playlist', function(req, res) {
   User.findOne({username: req.session['username']}, function(err, user) {
-    var playlist = user.playlists.id(req.body.playlist_name)
-    console.log(playlist)
-    res.json(playlist)
-  })
-})
+    var playlist = user.playlists.id(req.body.playlist_name);
+    res.json(playlist);
+  });
+});
 
 // play tracks
 app.get('/api/player/:id', function(req, res) {
-  res.render('player', {id: req.params.id})
-})
+  res.render('player', {id: req.params.id});
+});
 
 // creates playlist
 app.post('/api/createPlaylist/:playlistName', function(req, res) {
   playlist = {playlist_name: req.params.playlistName, username: req.session.username, tracks: req.body.playlist, past: true, spotify_playlist_id: "nothing"};
   spotifyApi.getMe(function(err, data) {
     if (err) {
-      console.log(err)
-    }
-    spotifyApi.setAccessToken(spotifyApi.getAccessToken());
-    var spotify_user_id = data.body.id;
-  
+      console.log(err);
+    };
     spotifyApi.createPlaylist(data.body.id, req.params.playlistName, function(err, results) {
       if (err) {
-        console.log(err)
-      }
-      console.log(results.body)
+        console.log(err);
+      };
       var trackIds = [];
-      playlist.spotify_playlist_id = results.body.uri
+      playlist.spotify_playlist_id = results.body.uri;
       User.findOne({username: req.session['username']}, function(err, user) {
         if (err) {
-          console.log(err)
-        }
+          console.log(err);
+        };
         user.playlists.push(playlist)
         user.save(function(err, results) {
           if (err) {
             console.log(err);
-          }
-          console.log('saved')
-        })
-      })
+          };
+        });
+      });
       req.body.playlist.forEach(function(track) {
         trackIds.push("spotify:track:"+track.spotify_id);
       });
-      console.log(playlist)
       spotifyApi.addTracksToPlaylist(spotify_user_id, results.body.id, trackIds).then(function(err, data) {
         if (err) {
-          console.log(err)
-        }
+          console.log(err);
+        };
         res.json({tracks: 'tracks added'});
-      })
+      });
     });
-  })
-})
+  });
+});
   
 
 // gets more info on album
@@ -220,12 +208,12 @@ app.get('/api/album/:id', function(req, res) {
   spotifyApi.getAlbum(req.params.id, function(err, results) {
     if (err) {
       console.log(err);
-    }
+    };
     res.json(results.body);
-  })
-})
+  });
+});
 
 // run server
 app.listen(process.env.PORT || 3000, function() {
-  console.log('yaaaaaaaas');
-})
+  console.log('Connected on Port 3000');
+});

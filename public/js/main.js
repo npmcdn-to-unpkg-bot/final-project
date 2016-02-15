@@ -79,7 +79,7 @@ $(document).ready(function() {
                 currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
               });
               $('.play-track').on('click', function(event) {
-                window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=350,background=black");
+                window.open('https://new-releases.herokuapp.com/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=350,background=black");
               });
             });
           });
@@ -117,7 +117,7 @@ $(document).ready(function() {
               dataType: 'json'
             }).done(function(results) {
               console.log(results)
-              window.open('http://localhost:3000/api/player/'+event.target.getAttribute('playlist_id'), 'musicPlayer', "height=300,width=380")
+              window.open('https://new-releases.herokuapp.com/api/player/'+event.target.getAttribute('playlist_id'), 'musicPlayer', "height=300,width=380")
               // https://new-releases.herokuapp.com
             })
           })
@@ -198,7 +198,7 @@ $(document).ready(function() {
       type: 'GET',
       dataType: 'json'
     }).done(
-      location.href='http://localhost:3000/'
+      location.href='https://new-releases.herokuapp.com/'
     );
   });
   // grid stuff

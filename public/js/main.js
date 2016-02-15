@@ -41,46 +41,50 @@ $(document).ready(function() {
     type: 'GET',
     dataType: 'json'
   }).done(function(results){
-    parsedResults = JSON.parse(results);
-    albums = parsedResults.albums.items;
-    newAlbums = [];
-    for( var i=0; i<albums.length-1; i++ ) {
-      if (!(albums[i].name == albums[i+1].name)) {
-        newAlbums.push(albums[i]);
+    console.log(results)
+    results.forEach(function(albums) {
+      albums = JSON.parse(albums.body);
+      albums = albums.albums.items
+      console.log(albums);
+      newAlbums = [];
+      for ( var i=0; i<albums.length-1; i++ ) {
+        if (!(albums[i].name == albums[i+1].name)) {
+          newAlbums.push(albums[i]);
+        };
       };
-    };
-    newAlbums.forEach(function(album) {
-      $.ajax({
-        url: '/api/album/'+album.id,
-        type: 'GET',
-        dataType: 'json'
-      }).done(function(album) {
-        albumImg = $('<img>').attr('src', album.images[1].url).addClass('grid-item').on('click', function() {
-          // individual albums ajax
-          $.ajax({
-            url: '/api/album/'+album.id,
-            type: 'GET',
-            dataType: 'json'
-          }).done(function(album) {
-            // modals with handlebars
-            if ($('#album-content')) {
-              $('.modal').remove();
-            };
-            artist = album.artists[0].name;
-            tracks = album.tracks.items;
-            createModal($("#entry-template"), {album_name: album.name, tracks: tracks, artist: artist});
-            $(".add-button").on('click', function(event) {
-              track_id = event.target.getAttribute('track_id');
-              artist = $('#artist-name').text();
-              track_name = event.target.getAttribute('track_name');
-              currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
-            });
-            $('.play-track').on('click', function(event) {
-              window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=350,background=black");
+      newAlbums.forEach(function(album) {
+        $.ajax({
+          url: '/api/album/'+album.id,
+          type: 'GET',
+          dataType: 'json'
+        }).done(function(album) {
+          albumImg = $('<img>').attr('src', album.images[1].url).addClass('grid-item').on('click', function() {
+            // individual albums ajax
+            $.ajax({
+              url: '/api/album/'+album.id,
+              type: 'GET',
+              dataType: 'json'
+            }).done(function(album) {
+              // modals with handlebars
+              if ($('#album-content')) {
+                $('.modal').remove();
+              };
+              artist = album.artists[0].name;
+              tracks = album.tracks.items;
+              createModal($("#entry-template"), {album_name: album.name, tracks: tracks, artist: artist});
+              $(".add-button").on('click', function(event) {
+                track_id = event.target.getAttribute('track_id');
+                artist = $('#artist-name').text();
+                track_name = event.target.getAttribute('track_name');
+                currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
+              });
+              $('.play-track').on('click', function(event) {
+                window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=350,background=black");
+              });
             });
           });
+          $('#album-container').append(albumImg);
         });
-        $('#album-container').append(albumImg);
       });
     });
   });

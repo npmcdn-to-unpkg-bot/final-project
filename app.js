@@ -1,4 +1,4 @@
-// express app, body-parser, request, mongoose, bcrypt, sessions, and mongoose models
+// express app, body-parser, request, mongoose, bcrypt, sessions, waterfall, and mongoose models
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -42,9 +42,11 @@ app.use(session({
 }));
 
 // page route handlers
+// renders login form
 app.get('/', function (req, res) {
   res.render('login');
 });
+
 // renders dashboard?
 app.get('/index', function (req, res) {
   if (req.query.code) {
@@ -57,11 +59,13 @@ app.get('/index', function (req, res) {
   };
   res.render('index');
 });
+
 // renders sign up form
 app.get('/users/new', function (req, res) {
   res.render('sign_up');
 });
-// creates user and redirects to login
+
+// creates user and redirects to oauth url
 app.post('/users', function (req, res) {
   User.createDigestAndSave({username: req.body.username, password: req.body.password}, function(user) {
     req.session['username'] = user.username;
@@ -69,7 +73,8 @@ app.post('/users', function (req, res) {
     res.redirect(authorizeUrl);
   });
 });
-// logs user in, creates session, and redirects to /login
+
+// logs user in, creates session, and redirects to oauth url
 app.post('/login', function (req, res){
   User.authenticateUser(req.body.username, req.body.password, function(user){
     if (user) {
@@ -87,52 +92,40 @@ app.get('/logout', function(req, res) {
   req.session.user = false;
   req.session.userId = false;
 });
+
 // ajax route handlers
 // oauth
 app.get('/api/oauth', function(req, res) {
   res.json(authorizeUrl);
 });
-// grabs 1st 20 new releases
+
+// grabs 100 new release albums
 app.get('/api/newReleases', function(req, res) {
-//   waterfall([
-//     function(callback) {
-//       request('https://api.spotify.com/v1/search?q=tag:new&type=album', function(err, results) {
-//         if (err) {
-//           console.log(err);
-//         }
-//         callback(null, results);
-//       })
-//     },
-//     function(arg1, callback) {
-//       request('https://api.spotify.com/v1/search?q=tag:new&type=album&offset=20', function(err, results) {
-//         if (err) {
-//           console.log(err);
-//         }
-//         callback(null, arg1, results)
-//       })
-//     },
-//     function(arg1, arg2, callback) {
-//       request('https://api.spotify.com/v1/search?q=tag:new&type=album&offset=40', function(err, results) {
-//         if (err) {
-//           console.log(err);
-//         }
-//         callback(null, arg1, arg2, results)
-//       })
-//     }
-//   ],
-//   function(err, arg1, arg2, arg3) {
-//     albums = [arg1, arg2, arg3];
-//     res.json(albums);
-//   }) 
-// })
-  request('https://api.spotify.com/v1/search?q=tag:new&type=album&limit=50', function(err, results) {
-    if (err) {
-      console.log(err);
-    };
-    res.json(results.body);
-  });
+  waterfall([
+    function(callback) {
+      request('https://api.spotify.com/v1/search?q=tag:new&type=album&limit=50', function(err, results) {
+        if (err) {
+          console.log(err);
+        }
+        callback(null, results);
+      })
+    },
+    function(arg1, callback) {
+      request('https://api.spotify.com/v1/search?q=tag:new&type=album&limit=50&offset=50', function(err, results) {
+        if (err) {
+          console.log(err);
+        }
+        callback(null, arg1, results)
+      })
+    }
+  ],
+  function(err, arg1, arg2) {
+    albums = [arg1, arg2];
+    res.json(albums);
+  })
 });
 
+// gets local user info
 app.get('/api/getUser', function(req, res) {
   User.findOne({username: req.session['username']}, function (err, user) {
     if (err) {
@@ -203,7 +196,7 @@ app.post('/api/createPlaylist/:playlistName', function(req, res) {
 });
   
 
-// gets more info on album
+// gets album details
 app.get('/api/album/:id', function(req, res) {
   spotifyApi.getAlbum(req.params.id, function(err, results) {
     if (err) {
@@ -213,7 +206,7 @@ app.get('/api/album/:id', function(req, res) {
   });
 });
 
-// run server
+// runs server
 app.listen(process.env.PORT || 3000, function() {
   console.log('Connected on Port 3000');
 });

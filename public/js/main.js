@@ -1,4 +1,29 @@
 var currentPlaylist = [];
+
+var createModal = function(element, context) {
+  var source = element.html();
+  var template = Handlebars.compile(source);
+  var html = template(context);
+  var shadow = $('<div>').addClass('shadow');
+  $('body').append(shadow);
+  $('body').append(html);
+  $('.shadow').on('click', function() {
+    $('.shadow').remove();
+    $('.modal').remove();
+  });
+  $("#back-button").on('click', function() {
+    $('.modal').remove();
+    $('.shadow').remove();
+  });
+};
+
+var deleteModal = function() {
+  if ($('.modal')) {
+    $('.modal').remove();
+    $('.shadow').remove();
+  };
+};
+
 $(document).ready(function() {
   // oauth ajax
   $.ajax({
@@ -6,10 +31,9 @@ $(document).ready(function() {
     type: 'GET',
     dataType: 'json'
   }).done(function(results) {
-    console.log(results)
     $('#connect').click(function() {
       location.href=results;
-    })
+    });
   });
   // new release album ajax
   $.ajax({
@@ -17,227 +41,62 @@ $(document).ready(function() {
     type: 'GET',
     dataType: 'json'
   }).done(function(results){
-    parsedResults = JSON.parse(results)
-    albums = parsedResults.albums.items
-    newAlbums = [];
-    // stack overflow (come back to this)
-    // albums.sort( function( a, b){ return a.id - b.id; } );
-
-    // delete all duplicates from the array
-    for( var i=0; i<albums.length-1; i++ ) {
-      if (!(albums[i].name == albums[i+1].name)) {
-        newAlbums.push(albums[i]);
-      }
-    }
-    //end of stack overflow
-
-    console.log(newAlbums)
-    newAlbums.forEach(function(album) {
-      $.ajax({
-        url: '/api/album/'+album.id,
-        type: 'GET',
-        dataType: 'json'
-      }).done(function(album) {
-        albumImg = $('<img>').attr('src', album.images[1].url);
-        albumImg.addClass('grid-item');
-        albumImg.on('click', function() {
-          // individual albums ajax
-          $.ajax({
-            url: '/api/album/'+album.id,
-            type: 'GET',
-            dataType: 'json'
-          }).done(function(album) {
-            // modals with handlebars
-            if ($('#album-content')) {
-              $('.modal').remove();
-            }
-            artist = album.artists[0].name;
-            tracks = album.tracks.items;
-            console.log(album);
-            var source = $("#entry-template").html();
-            var template = Handlebars.compile(source);
-            var context = {album_name: album.name, tracks: tracks, artist: artist};
-            var html = template(context);
-            var shadow = $('<div>').addClass('shadow');
-            $('body').append(shadow);
-            $('body').append(html);
-            $('.shadow').on('click', function() {
-              $('.shadow').remove();
-              $('.modal').remove();
-            })
-            $("#back-button").on('click', function() {
-              $('.modal').remove();
-              $('.shadow').remove();
-            })
-            $(".add-button").on('click', function(event) {
-              track_id = event.target.getAttribute('track_id');
-              artist = $('#artist-name').text();
-              track_name = event.target.getAttribute('track_name');
-              currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
-            })
-            $('.play-track').on('click', function(event) {
-              window.open('https://new-releases.herokuapp.com/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=450,width=350")
-            })
-          })
-        })
-        $('#album-container').append(albumImg);
+    console.log(results)
+    results.forEach(function(albums) {
+      albums = JSON.parse(albums.body);
+      albums = albums.albums.items
+      console.log(albums);
+      newAlbums = [];
+      for ( var i=0; i<albums.length-1; i++ ) {
+        if (!(albums[i].name == albums[i+1].name)) {
+          newAlbums.push(albums[i]);
+        };
+      };
+      newAlbums.forEach(function(album) {
+        $.ajax({
+          url: '/api/album/'+album.id,
+          type: 'GET',
+          dataType: 'json'
+        }).done(function(album) {
+          albumImg = $('<img>').attr('src', album.images[1].url).addClass('grid-item').on('click', function() {
+            // individual albums ajax
+            $.ajax({
+              url: '/api/album/'+album.id,
+              type: 'GET',
+              dataType: 'json'
+            }).done(function(album) {
+              // modals with handlebars
+              if ($('#album-content')) {
+                $('.modal').remove();
+              };
+              artist = album.artists[0].name;
+              tracks = album.tracks.items;
+              createModal($("#entry-template"), {album_name: album.name, tracks: tracks, artist: artist});
+              $(".add-button").on('click', function(event) {
+                track_id = event.target.getAttribute('track_id');
+                artist = $('#artist-name').text();
+                track_name = event.target.getAttribute('track_name');
+                currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
+              });
+              $('.play-track').on('click', function(event) {
+                window.open('http://localhost:3000/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=350,background=black");
+              });
+            });
+          });
+          $('#album-container').append(albumImg);
+        });
       });
-    // size based on popularity?
-    })
-  });
-  $.ajax({
-    url: '/api/newReleasesTwo',
-    type: 'GET',
-    dataType: 'json'
-  }).done(function(results){
-    parsedResults = JSON.parse(results)
-    albums = parsedResults.albums.items
-    newAlbums = [];
-    for( var i=0; i<albums.length-1; i++ ) {
-      if (!(albums[i].name == albums[i+1].name)) {
-        newAlbums.push(albums[i]);
-      }
-    }
-    console.log(newAlbums)
-    newAlbums.forEach(function(album) {
-      // individual albums ajax
-      $.ajax({
-        url: '/api/album/'+album.id,
-        type: 'GET',
-        dataType: 'json'
-      }).done(function(album) {
-        albumImg = $('<img>').attr('src', album.images[1].url).addClass('grid-item').on('click', function() {
-          $.ajax({
-            url: '/api/album/'+album.id,
-            type: 'GET',
-            dataType: 'json'
-          }).done(function(album) {
-            // modals with handlebars
-            if ($('.modal')) {
-              $('.modal').remove();
-            }
-            artist = album.artists[0].name;
-            tracks = album.tracks.items;
-            var source = $("#entry-template").html();
-            var template = Handlebars.compile(source);
-            var context = {album_name: album.name, tracks: tracks, artist: artist};
-            var html = template(context);
-            var shadow = $('<div>').addClass('shadow');
-            $('body').append(shadow);
-            $('body').append(html);
-            $('.shadow').on('click', function() {
-              $('.modal').remove();
-              $('.shadow').remove();
-            })
-            $("#back-button").on('click', function() {
-              $('.modal').remove();
-              $('.shadow').remove();
-            })
-            $(".add-button").on('click', function(event) {
-              track_id = event.target.getAttribute('track_id');
-              artist = $('#artist-name').text();
-              track_name = event.target.getAttribute('track_name');
-              currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
-            })
-            $('.play-track').on('click', function(event) {
-              window.open('https://new-releases.herokuapp.com/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=380")
-            })
-          })
-        })
-        $('#album-container').append(albumImg);
-      });
-    // size based on popularity?
-    })
-  });
-  $.ajax({
-    url: '/api/newReleasesThree',
-    type: 'GET',
-    dataType: 'json'
-  }).done(function(results){
-    parsedResults = JSON.parse(results)
-    albums = parsedResults.albums.items
-    newAlbums = [];
-    for( var i=0; i<albums.length-1; i++ ) {
-      if (!(albums[i].name == albums[i+1].name)) {
-        newAlbums.push(albums[i]);
-      }
-    }
-    console.log(newAlbums)
-    newAlbums.forEach(function(album) {
-      // individual albums ajax
-      $.ajax({
-        url: '/api/album/'+album.id,
-        type: 'GET',
-        dataType: 'json'
-      }).done(function(album) {
-        albumImg = $('<img>').attr('src', album.images[1].url).addClass('grid-item').on('click', function() {
-          $.ajax({
-            url: '/api/album/'+album.id,
-            type: 'GET',
-            dataType: 'json'
-          }).done(function(album) {
-            // modals with handlebars
-            if ($('.modal')) {
-              $('.modal').remove();
-            }
-            artist = album.artists[0].name;
-            tracks = album.tracks.items;
-            var source = $("#entry-template").html();
-            var template = Handlebars.compile(source);
-            var context = {album_name: album.name, tracks: tracks, artist: artist};
-            var html = template(context);
-            var shadow = $('<div>').addClass('shadow');
-            $('body').append(shadow);
-            $('body').append(html);
-            $('.shadow').on('click', function() {
-              $('.modal').remove();
-              $('.shadow').remove();
-            })
-            $("#back-button").on('click', function() {
-              $('.modal').remove();
-              $('.shadow').remove();
-            })
-            $(".add-button").on('click', function(event) {
-              track_id = event.target.getAttribute('track_id');
-              artist = $('#artist-name').text();
-              track_name = event.target.getAttribute('track_name');
-              currentPlaylist.push({spotify_id: track_id, track_name: track_name, track_artist: artist, current: true});
-            })
-            $('.play-track').on('click', function(event) {
-              window.open('https://new-releases.herokuapp.com/api/player/spotify:track:'+event.target.getAttribute('track_id'), 'musicPlayer', "height=400,width=380")
-            })
-          })
-        })
-        $('#album-container').append(albumImg);
-      });
-    })
+    });
   });
   // User modal
   $('#my_page').on('click', function() {
-    if ($('.modal')) {
-      $('.modal').remove();
-    }
+    deleteModal();
     $.ajax({
       url: '/api/getUser',
       type: 'GET',
       dataType: 'json'
     }).done(function(user) {
-      console.log(user)
-      var source = $('#user-modal-template').html();
-      var template = Handlebars.compile(source);
-      var context = {user_name: user.username, playlists: user.playlists};
-      var html = template(context);
-      var shadow = $('<div>').addClass('shadow');
-      $('body').append(shadow);
-      $('body').append(html);
-      $("#back-button").on('click', function() {
-        $('.modal').remove();
-        $('.shadow').remove();
-      })
-      $('.shadow').on('click', function() {
-        $('.shadow').remove();
-        $('.modal').remove();
-      })
+      createModal($('#user-modal-template'), {user_name: user.username, playlists: user.playlists});
       // view past playlist
       $('.view-playlist-button').on('click', function(event) {
         $.ajax({
@@ -248,100 +107,50 @@ $(document).ready(function() {
           },
           dataType: 'json'
         }).done(function(results) {
-          console.log(results)
-          if ($('.modal')) {
-            $('.modal').remove();
-            $('.shadow').remove();
-          }
-          var source = $("#entry-template-two").html();
-          var template = Handlebars.compile(source);
-          var context = {playlist_name: results.playlist_name, tracks: results.tracks, past: true, playlist_id: results.spotify_playlist_id}
-          var html = template(context);
-          var shadow = $('<div>').addClass('shadow');
-          $('body').append(shadow);
-          $('body').append(html);
-          $('.shadow').on('click', function() {
-            $('.shadow').remove();
-            $('.modal').remove();
-          })
-          $("#back-button").on('click', function() {
-            $('.modal').remove();
-            $('.shadow').remove();
-          })
+          var spotify_play_id = results.spotify_playlist_id;
+          deleteModal();
+          createModal($("#entry-template-two"), {playlist_name: results.playlist_name, tracks: results.tracks, past: true, playlist_id: results.spotify_playlist_id});
           $(".play-playlist").on('click', function(event) {
-            console.log(event.target.getAttribute('playlist_id'));
             $.ajax({
               url: 'api/getUser/spotify',
               type: 'GET',
               dataType: 'json'
             }).done(function(results) {
               console.log(results)
-              window.open('https://new-releases.herokuapp.com/api/player/'+event.target.getAttribute('playlist_id'), 'musicPlayer', "height=300,width=380")
+              window.open('http://localhost:3000/api/player/'+event.target.getAttribute('playlist_id'), 'musicPlayer', "height=300,width=380")
+              // https://new-releases.herokuapp.com
             })
           })
         })
       });
-    })
-  })
+    });
+  });
   // view current playlist
   $('#view-playlist').on('click', function() {
-    if ($('.modal')) {
-      $('.modal').remove();
-      $('.shadow').remove();
-    }
-    var source = $("#entry-template-two").html();
-    var template = Handlebars.compile(source);
-    var context = {playlist_name: 'Current Playlist', tracks: currentPlaylist, current: true}
-    var html = template(context);
-    var shadow = $('<div>').addClass('shadow');
-    $('body').append(shadow);
-    $('body').append(html);
-    $('.shadow').on('click', function() {
-      $('.shadow').remove();
-      $('.modal').remove();
-    })
+    deleteModal();
+    createModal($("#entry-template-two"), {playlist_name: 'Current Playlist', tracks: currentPlaylist, current: true});
     $('.remove-track').on('click', function(event) {
       currentPlaylist = currentPlaylist.filter(function(track) {
         if (event.target.getAttribute('track_id') === track.spotify_id) {
-          return false
+          return false;
         } else {
-          return track
-        }
-      })
-      if ($('.modal')) {
-        $('.shadow').remove();
-        $('.modal').remove();
-      }
-      var source = $("#entry-template-two").html();
-      var template = Handlebars.compile(source);
-      var context = {playlist_name: "Current Playlist", tracks: currentPlaylist, current: true}
-      var html = template(context);
-      var shadow = $('<div>').addClass('shadow');
-      $('body').append(shadow);
-      $('body').append(html);
-      $('.shadow').on('click', function() {
-        $('.shadow').remove();
-        $('.modal').remove();
-      })
-      $("#back-button").on('click', function() {
-        $('.modal').remove();
-        $('.shadow').remove();
-      })
+          return track;
+        };
+      });
+      deleteModal();
+      createModal($("#entry-template-two"), {playlist_name: "Current Playlist", tracks: currentPlaylist, current: true});
       $('#delete-button').on('click', function() {
         currentPlaylist = [];
-        $('.modal').remove();
-        $('.shadow').remove();
-      })
+        deleteModal();
+      });
       $('#submit-playlist').on('click', function() {
         if ($('playlist-title').val() === '') {
           event.preventDefault();
-        }
-        // currentPlaylist.current = false;
+        };
         currentPlaylist = currentPlaylist.filter(function(track) {
           track.current = false;
-          return track
-        })
-        console.log(currentPlaylist)
+          return track;
+        });
         $.ajax({
           url: '/api/createPlaylist/'+$('#playlist-title').val(),
           type: 'POST',
@@ -351,45 +160,35 @@ $(document).ready(function() {
           }
         }).done(function (results) {
           currentPlaylist = [];
-          $('.modal').remove();
-          $('.shadow').remove();
+          deleteModal();
         })
       })
-    })
-    $("#back-button").on('click', function() {
-      $('.modal').remove();
-      $('.shadow').remove();
     })
     // dump current playlist
     $('.delete-button').on('click', function() {
       currentPlaylist = [];
-      $('.modal').remove();
-      $('.shadow').remove();
+      deleteModal();
     })
     // create playlist
     $('#submit-playlist').on('click', function() {
       if ($('playlist-title').val() === '') {
         event.preventDefault();
-      }
+      };
       currentPlaylist.current = false;
       currentPlaylist = currentPlaylist.filter(function(track) {
         track.current = false;
-        return track
-      })
+        return track;
+      });
       $.ajax({
         url: '/api/createPlaylist/'+$('#playlist-title').val(),
         type: 'POST',
         dataType: 'json',
-        data: {
-          playlist: currentPlaylist
-        }
+        data: {playlist: currentPlaylist}
       }).done(function (results) {
-        console.log(results);
         currentPlaylist = [];
-        $('.modal').remove();
-        $('.shadow').remove();
-      })
-    })
+        deleteModal();
+      });
+    });
   });
 
   // logout ajax
@@ -399,9 +198,9 @@ $(document).ready(function() {
       type: 'GET',
       dataType: 'json'
     }).done(
-      location.href='https://new-releases.herokuapp.com/'
-    )
-  })
+      location.href='http://localhost:3000/'
+    );
+  });
   // grid stuff
   $('.grid').masonry({
     itemSelector: '.grid-item',

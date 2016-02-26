@@ -70,7 +70,7 @@ app.post('/users', function (req, res) {
   User.createDigestAndSave({username: req.body.username, password: req.body.password}, function(user) {
     req.session['username'] = user.username;
     req.session['userId'] = user._id;
-    res.redirect(authorizeUrl);
+    res.redirect('index');
   });
 });
 
@@ -80,7 +80,7 @@ app.post('/login', function (req, res){
     if (user) {
       req.session['username'] = user.username;
       req.session['userId'] = user._id;
-      res.redirect(authorizeUrl);
+      res.redirect('index');
     } else {
       res.redirect('/');
     };

@@ -1,5 +1,12 @@
 var currentPlaylist = [];
 
+var deleteModal = function() {
+  if ($('.modal')) {
+    $('.modal').remove();
+    $('.shadow').remove();
+  };
+};
+
 var createModal = function(element, context) {
   var source = element.html();
   var template = Handlebars.compile(source);
@@ -8,8 +15,8 @@ var createModal = function(element, context) {
   $('body').append(shadow);
   $('body').append(html);
   $('.shadow').on('click', function() {
-    $('.shadow').remove();
     $('.modal').remove();
+    $('.shadow').remove();
   });
   $("#back-button").on('click', function() {
     $('.modal').remove();
@@ -17,23 +24,23 @@ var createModal = function(element, context) {
   });
 };
 
-var deleteModal = function() {
-  if ($('.modal')) {
-    $('.modal').remove();
-    $('.shadow').remove();
-  };
-};
-
-$(document).ready(function() {
-  // oauth ajax
+var instructionModal = function() {
+  createModal($('#instructions-template'), {});
   $.ajax({
     url: '/api/oauth',
     type: 'GET',
     dataType: 'json'
   }).done(function(results) {
-    $('#connect').click(function() {
+    $('#connect-button').click(function() {
       location.href=results;
     });
+  });
+};
+
+$(document).ready(function() {
+  // oauth ajax
+  $('#help').click(function() {
+    instructionModal();
   });
   // new release album ajax
   $.ajax({

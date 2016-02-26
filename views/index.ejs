@@ -12,6 +12,14 @@
 </head>
 <body>
 
+  <script id="instructions-template" type="text/x-handlebars-instructions">
+    <div class="modal">
+      <h1>Welcome to New Releases</h1>
+      <p>This web app relies heavily on the use of a Spotfiy account.  Although the site operates fine without one, it is encouraged to use a Spotify account along with this site.</p>
+      <button class="ui button" id="connect-button">Connect With Spotify</button>
+    </div>
+  </script>
+
   <script id="entry-template" type="text/x-handlebars-template">
     <div class="modal" id="album-content">
       <h1 id="playlist-header">{{album_name}}</h1>
@@ -90,7 +98,6 @@
         {{#each playlists}}
           <p class="playlist-modal-p">
             {{playlist_name}}
-            
           </p>
           <div class="view-button-div">
             <button class="view-playlist-button small circular ui icon button" playlist={{_id}}>
@@ -110,7 +117,7 @@
   <div id="button-div">
     <button class="ui inverted green button sgreen" id="my_page">My Page</button>
     <button class="ui inverted green button sgreen" id="view-playlist">Current Playlist</button>
-    <button class="ui inverted green button sgreen" id="connect">Reconnect</button>
+    <button class="ui inverted green button sgreen" id="help">Help</button>
     <button class="ui inverted green button sgreen" id="logout">Logout</button>
   </div>
 

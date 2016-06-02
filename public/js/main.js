@@ -123,7 +123,9 @@ $(document).ready(function() {
               type: 'GET',
               dataType: 'json'
             }).done(function(results) {
-              window.open('https://new-releases.herokuapp.com/api/player/'+spotify_play_id, 'musicPlayer', "height=300,width=380");
+              console.log(results)
+              window.open('https://new-releases.herokuapp.com/api/player/'+event.target.getAttribute('playlist_id'), 'musicPlayer', "height=300,width=380");
+              // https://new-releases.herokuapp.com
             });
           });
         });

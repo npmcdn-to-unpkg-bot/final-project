@@ -64,7 +64,7 @@ body {
   text-align: center;
   bottom: 5px;
   left: 32%;
-  color: #2EBD59;
+  color: black;
 }
 
 #spotify-anchor {
@@ -72,7 +72,7 @@ body {
   text-align: center;
   bottom: 5px;
   left: 40px;
-  color: #2EBD59;
+  color: black;
 }
 
 #spotify-logo {
@@ -147,11 +147,12 @@ body {
 #login-submit-button {
   display: block;
   margin: 0 auto;
-  margin-top: 75px;
+  margin-top: 150px;
   width: 410px;
-  background-color: #2EBD59;
+  background-color: white;
   border-radius: 20px;
   border-width: 0px;
+  border: 1px solid black;
   height: 28px;
   font-weight: 500;
   font-size: 20px;

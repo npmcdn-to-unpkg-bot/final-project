@@ -19,7 +19,15 @@
       </div>
       <input id="login-submit-button" type="submit" value="Log In">
     </form>
+    <p id="or-para">Or</p>
+    <button id="guest-signin">Sign In as Guest</button>
     <a id="sign-up-anchor" href="/users/new">Not a Member? Sign Up!</a>
   </div>
+  <script type="text/javascript">
+    guest_button = document.getElementById('guest-signin');
+    guest_button.addEventListener('click', function() {
+      document.location = 'https://new-releases.herokuapp.com/index';
+    })
+  </script>
 </body>
 </html>

@@ -56,6 +56,7 @@ body {
 #login-header {
   text-align: center;
   margin-bottom: 100px;
+  margin-top: 20px;
 }
 
 #sign-up-anchor {
@@ -209,4 +210,21 @@ body {
   font-size: 20px;
   text-decoration: bold;
   width: 450px;
+}
+
+#or-para {
+  margin-top: 15px;
+  text-align: center;
+}
+
+#guest-signin {
+  display: block;
+  margin: 0 auto;
+  width: 410px;
+  background-color: #2EBD59;
+  border-radius: 20px;
+  border-width: 0px;
+  height: 28px;
+  font-weight: 500;
+  font-size: 20px;
 }

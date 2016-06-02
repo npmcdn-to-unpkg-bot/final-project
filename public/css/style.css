@@ -147,7 +147,7 @@ body {
 #login-submit-button {
   display: block;
   margin: 0 auto;
-  margin-top: 150px;
+  margin-top: 75px;
   width: 410px;
   background-color: white;
   border-radius: 20px;
@@ -222,9 +222,10 @@ body {
   display: block;
   margin: 0 auto;
   width: 410px;
-  background-color: #2EBD59;
+  background-color: white;
   border-radius: 20px;
   border-width: 0px;
+  border: 1px solid black;
   height: 28px;
   font-weight: 500;
   font-size: 20px;
